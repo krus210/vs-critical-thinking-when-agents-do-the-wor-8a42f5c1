@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Критическое мышление при работе с агентами · визуальный конспект</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080810; --bg2:#0d0d18; --panel:#12121f; --panel2:#171727; --line:#262638;
+    --ink:#f0f0f8; --muted:#aeb4c8; --faint:#8a8aa2;
+    --purple:#a78bfa; --purple-deep:#7c5cff; --green:#4ade80; --red:#fb7185;
+    --amber:#fbbf24; --blue:#60a5fa; --cyan:#22d3ee; --coral:#e07a5a;
+    --radius:18px; --maxw:1120px;
+    --gutter:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(900px 500px at 78% -8%, rgba(124,92,255,.20), transparent 60%),
+      radial-gradient(800px 600px at 0% 18%, rgba(34,211,238,.07), transparent 55%),
+      radial-gradient(700px 600px at 100% 90%, rgba(224,122,90,.08), transparent 60%)}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;line-height:1.12;letter-spacing:-.02em;font-weight:700;margin:0}
+  ::selection{background:rgba(124,92,255,.35)}
+
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+    background:linear-gradient(90deg,var(--purple-deep),var(--coral));box-shadow:0 0 14px rgba(124,92,255,.7)}
+
+  nav{position:sticky;top:0;z-index:90;backdrop-filter:blur(14px);
+    background:rgba(8,8,16,.72);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:18px;padding-top:11px;padding-bottom:11px;padding-inline:var(--gutter)}
+  .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;white-space:nowrap;display:flex;gap:9px;align-items:center}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--coral);box-shadow:0 0 12px var(--coral)}
+  .nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-left:auto;min-width:0;-webkit-overflow-scrolling:touch}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{font-size:12.5px;color:var(--muted);padding:6px 11px;border-radius:9px;white-space:nowrap;transition:.18s;font-weight:500}
+  .nav-links a:hover{color:var(--ink);background:var(--panel2)}
+  .nav-links a.active{color:#fff;background:linear-gradient(135deg,var(--purple-deep),#5b3fd6)}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+  section{padding-top:76px;padding-bottom:52px;scroll-margin-top:70px;border-top:1px solid rgba(255,255,255,.06)}
+
+  .hero{padding-top:54px;padding-bottom:40px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono';font-size:12px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--purple);
+    border:1px solid rgba(167,139,250,.3);padding:6px 13px;border-radius:999px;background:rgba(124,92,255,.08)}
+  .hero h1{font-size:clamp(34px,6vw,62px);margin:22px 0 8px;background:linear-gradient(180deg,#fff 30%,#b9b4e8);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .sub{font-size:clamp(17px,2.4vw,22px);color:var(--muted);max-width:780px;font-weight:500}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 30px}
+  .chip{font-family:'JetBrains Mono';font-size:12.5px;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);padding:7px 13px;border-radius:10px;display:flex;gap:7px;align-items:center}
+  .chip b{color:var(--purple);font-weight:700}
+  .hero-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:26px;align-items:stretch;margin-top:8px}
+  @media(max-width:840px){.hero-grid{grid-template-columns:1fr}}
+  .thesis-card{background:linear-gradient(160deg,var(--panel),#0e0e1a);border:1px solid var(--line);
+    border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden}
+  .thesis-card::before{content:"\201C";position:absolute;top:-30px;right:6px;font-size:150px;font-family:Georgia,serif;
+    color:rgba(167,139,250,.10);line-height:1}
+  .thesis-card .lab{font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .thesis-card p{font-size:19px;font-weight:500;margin:0;color:#f3f2fb}
+  .thesis-card .accent{color:var(--coral);font-weight:700}
+  .cover{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);display:block;background:#f9f7f3}
+  .cover img{width:100%;height:auto;display:block;transition:.4s}
+  .cover:hover img{transform:scale(1.02)}
+  .cover .ribbon{position:absolute;left:0;bottom:0;right:0;padding:12px 16px;
+    background:linear-gradient(0deg,rgba(0,0,0,.82),transparent);font-size:13px;color:#eee;font-weight:500}
+
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+  .shead .num{font-family:'JetBrains Mono';font-size:13px;color:var(--purple);border:1px solid rgba(167,139,250,.3);
+    border-radius:8px;padding:3px 9px;background:rgba(124,92,255,.07)}
+  .shead h2{font-size:clamp(24px,3.6vw,34px)}
+  .shead .src{margin-left:auto}
+  .lead{color:var(--muted);font-size:16.5px;max-width:800px;margin:-6px 0 26px}
+  .lead strong{color:var(--ink)}
+
+  .src{font-family:'JetBrains Mono';font-size:12px;color:var(--cyan);border:1px solid rgba(34,211,238,.28);
+    background:rgba(34,211,238,.06);padding:3px 9px;border-radius:7px;white-space:nowrap;transition:.16s;display:inline-flex;gap:6px;align-items:center}
+  .src:hover{background:rgba(34,211,238,.18);color:#fff;border-color:var(--cyan)}
+  .src svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:840px){.g2,.g3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px;transition:.22s}
+  .card:hover{border-color:rgba(167,139,250,.4);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
+  .card h3{font-size:18px;margin-bottom:9px;display:flex;align-items:center;gap:10px}
+  .card h3 .ic{width:30px;height:30px;border-radius:8px;background:rgba(124,92,255,.13);display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
+  .card p{margin:0 0 10px;color:var(--muted);font-size:15px}
+  .card p:last-child{margin-bottom:0}
+  .card strong{color:var(--ink);font-weight:600}
+  .card .en{font-family:'JetBrains Mono';font-size:12.5px;color:var(--faint);margin-bottom:8px;display:block}
+
+  /* spectrum levels */
+  .lvl{border-top:3px solid var(--line)}
+  .lvl.l1{border-top-color:#e8e6f5}
+  .lvl.l2{border-top-color:var(--amber)}
+  .lvl.l3{border-top-color:var(--coral)}
+  .lvl .tag{display:inline-block;font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-bottom:10px}
+  .l1 .tag{color:#e8e6f5;background:rgba(232,230,245,.08)}
+  .l2 .tag{color:var(--amber);background:rgba(251,191,36,.08)}
+  .l3 .tag{color:var(--coral);background:rgba(224,122,90,.1)}
+
+  figure{margin:0}
+  .shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0c0c16;cursor:zoom-in;position:relative;transition:.22s}
+  .shot.light{background:#fff}
+  .shot:hover{border-color:var(--purple);box-shadow:0 0 0 1px var(--purple),0 12px 36px rgba(124,92,255,.25)}
+  .shot img{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
+  .shot .badge{position:absolute;top:9px;left:9px;font-family:'JetBrains Mono';font-size:10.5px;color:#fff;
+    background:rgba(0,0,0,.62);backdrop-filter:blur(4px);padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.14)}
+  .shot .zoom{position:absolute;top:9px;right:9px;width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.55);
+    display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s}
+  .shot:hover .zoom{opacity:1}
+  .shot .zoom svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2}
+  figcaption{font-size:13.5px;color:var(--muted);margin-top:9px;padding:0 2px}
+  figcaption b{color:var(--ink);font-weight:600}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  @media(max-width:840px){.split{grid-template-columns:1fr}}
+
+  .canvas{background:radial-gradient(circle at 50% 0%,#0c0c16,#060609);border:1px solid var(--line);border-radius:var(--radius);padding:10px}
+  .canvas svg{width:100%;height:auto;display:block;border-radius:12px}
+  .cap-hand{font-family:'Caveat';font-size:17px;color:var(--muted);text-align:center;padding:6px 0 4px}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:14.5px;overflow:hidden;border-radius:12px;border:1px solid var(--line)}
+  .tbl th,.tbl td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl th{background:var(--panel2);font-family:'JetBrains Mono';font-size:12px;color:var(--purple);letter-spacing:.04em;font-weight:600}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl td{color:var(--muted)}
+  .tbl td:first-child{color:var(--ink);font-weight:600}
+  .tbl .ok{color:var(--green)} .tbl .no{color:var(--coral)}
+
+  .quotes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:840px){.quotes{grid-template-columns:1fr}}
+  .quote{background:linear-gradient(150deg,var(--panel2),#0d0d18);border:1px solid var(--line);
+    border-left:3px solid var(--coral);border-radius:14px;padding:20px 22px}
+  .quote .q{font-family:'Space Grotesk';font-size:17px;font-weight:500;color:#f1f0fb;line-height:1.4}
+  .quote .tr{font-size:14.5px;color:var(--muted);margin-top:8px}
+  .quote .m{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--faint);flex-wrap:wrap}
+
+  .tl{position:relative;margin-top:6px;padding-left:30px}
+  .tl::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,#e8e6f5,var(--amber),var(--coral))}
+  .tl-item{position:relative;padding:0 0 20px 0}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-26px;top:6px;width:13px;height:13px;border-radius:50%;
+    background:var(--bg);border:2.5px solid var(--purple)}
+  .tl-item.end::before{background:var(--coral);border-color:var(--coral);box-shadow:0 0 12px var(--coral)}
+  .tl-item p{margin:0;color:var(--muted);font-size:15px;max-width:720px}
+  .tl-item p b{color:var(--ink)}
+
+  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch}
+  .flow .arrow{align-self:center;color:var(--faint);font-size:22px}
+  .flow .step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px}
+  .flow .step.you{border-color:rgba(224,122,90,.45);background:linear-gradient(160deg,rgba(224,122,90,.08),var(--panel))}
+  .flow .step .who{font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .flow .step.you .who{color:var(--coral)}
+  .flow .step h3{font-size:16.5px;margin-bottom:6px}
+  .flow .step p{margin:0;color:var(--muted);font-size:15px}
+  @media(max-width:840px){.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg);justify-self:center}}
+
+  .checks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:840px){.checks{grid-template-columns:1fr}}
+  .check{display:flex;gap:13px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:15px 16px;cursor:pointer;transition:.18s;user-select:none}
+  .check:hover{border-color:rgba(167,139,250,.4);background:var(--panel2)}
+  .check .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--faint);flex:0 0 auto;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:.18s}
+  .check .box svg{width:13px;height:13px;stroke:#fff;stroke-width:3;fill:none;opacity:0;transition:.18s}
+  .check.done .box{background:var(--green);border-color:var(--green)}
+  .check.done .box svg{opacity:1}
+  .check.done .txt{color:var(--faint);text-decoration:line-through}
+  .check .txt{font-size:15px;color:var(--ink)}
+  .check .txt b{color:var(--purple);font-weight:600}
+
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:840px){.tools{grid-template-columns:1fr}}
+  .tool-col h3{font-size:15px;color:var(--purple);margin-bottom:12px;font-family:'JetBrains Mono';letter-spacing:.04em}
+  .tool{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .tool:last-child{border-bottom:none}
+  .tool .name{font-weight:600;color:var(--ink);min-width:170px;flex:0 0 auto}
+  .tool a.name{color:var(--cyan)}
+  .tool a.name:hover{text-decoration:underline}
+  .tool .desc{color:var(--muted)}
+  @media(max-width:560px){.tool{flex-direction:column;gap:2px}.tool .name{min-width:0}}
+
+  footer{padding-top:46px;padding-bottom:70px;padding-inline:var(--gutter);color:var(--faint);font-size:13px;text-align:center;border-top:1px solid var(--line);margin-top:30px}
+  footer a{color:var(--purple)}
+
+  #lb{position:fixed;inset:0;z-index:200;background:rgba(4,4,9,.93);backdrop-filter:blur(8px);
+    display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;cursor:zoom-out}
+  #lb.on{display:flex;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  #lb img{max-width:94vw;max-height:80vh;border-radius:12px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.7);background:#fff}
+  #lb .lbcap{color:var(--muted);font-size:14px;margin-top:16px;max-width:760px;text-align:center}
+  #lb .lbbtn{margin-top:14px;display:inline-flex;gap:8px;align-items:center;background:var(--purple-deep);color:#fff;padding:10px 18px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px}
+  #lb .lbbtn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2}
+  #lb .close{position:absolute;top:20px;right:24px;color:#fff;font-size:30px;opacity:.7;cursor:pointer}
+
+  .rv{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1)}
+  .rv.in{opacity:1;transform:none}
+  .note{font-size:14.5px;color:var(--muted);background:rgba(224,122,90,.06);border:1px solid rgba(224,122,90,.28);border-radius:12px;padding:14px 16px;margin-top:18px}
+  .note b{color:var(--coral)}
+  .mt{margin-top:22px}
+
+  @media(max-width:640px){
+    :root{--gutter:18px;--radius:14px}
+    body{font-size:16px;line-height:1.6}
+    .nav-in{gap:12px}
+    .brand{font-size:13.5px}
+    .hero{padding-top:24px;padding-bottom:24px}
+    .hero h1{font-size:clamp(25px,7.2vw,32px);margin:14px 0 10px;line-height:1.18}
+    .hero .sub{font-size:16px;line-height:1.55}
+    .eyebrow{font-size:11px;padding:5px 11px;letter-spacing:.12em}
+    section{padding-top:52px;padding-bottom:36px;scroll-margin-top:56px}
+    .shead{margin-bottom:20px}
+    .shead h2{font-size:24px}
+    .lead{font-size:16px}
+    .grid{gap:14px}
+    .card{padding:16px 16px}
+    .card p,.tl-item p,.flow .step p,.check .txt{font-size:16px}
+    .thesis-card{padding:20px 18px}
+    .thesis-card p{font-size:17px}
+    .quote{padding:16px 18px}
+    .check{padding:12px 14px;gap:11px}
+    .tbl th,.tbl td{padding:9px 10px;font-size:14px}
+    footer{padding-top:36px;padding-bottom:60px;font-size:12.5px}
+  }
+</style>
+
+<style data-visual-html-responsive="v1">
+:root {
+  --page-gutter: 22px;
+  --gutter: 22px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100%;
+}
+
+body {
+  overflow-x: visible !important;
+}
+
+.wrap,
+.nav-in,
+footer,
+[data-mobile-container] {
+  width: 100% !important;
+  margin-inline: auto;
+  padding-inline: var(--page-gutter) !important;
+}
+
+section {
+  scroll-margin-top: 70px;
+}
+
+.grid > *,
+.hero-grid > *,
+.split > *,
+.quotes > *,
+.checks > *,
+.facts > *,
+.tools > *,
+.debate > *,
+.nav-links,
+.navlinks,
+.shead > *,
+.sec-head > *,
+.tl-item,
+.timeline > *,
+[data-mobile-stack] > * {
+  min-width: 0;
+}
+
+img,
+video,
+audio,
+canvas,
+iframe,
+figure {
+  max-width: 100% !important;
+}
+
+img,
+video,
+canvas {
+  height: auto;
+}
+
+video,
+audio,
+iframe {
+  display: block;
+  width: 100% !important;
+}
+
+iframe {
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+svg {
+  max-width: 100%;
+}
+
+pre,
+table,
+.tbl,
+[data-mobile-scroll] {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+table,
+.tbl {
+  display: block;
+}
+
+[data-mobile-scroll] > svg {
+  width: 640px !important;
+  min-width: 640px !important;
+  max-width: none !important;
+  height: auto;
+}
+
+.k,
+.srcline,
+.srcline code,
+.eyebrow,
+.chip,
+.pill,
+.tag,
+.au,
+.src,
+.tc,
+.t,
+.timecode,
+.trick-head h3,
+.item-head h3,
+.check .txt,
+.talk p,
+.trick p,
+.trick li,
+.item p,
+.item li,
+.card p,
+.card li,
+.quote .q,
+.quote .ru,
+blockquote .ru,
+.tl-item p,
+.timeline p,
+.deb li,
+.callout,
+.fact .d,
+.tool .desc,
+[data-mobile-copy],
+[data-mobile-copy] p,
+[data-mobile-copy] li,
+[data-mobile-copy] dd,
+[data-mobile-wrap],
+code:not(pre code),
+h1,
+h2,
+h3,
+h4 {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.eyebrow,
+.chip,
+.pill,
+.tag,
+.au,
+.src,
+.links .src {
+  max-width: 100%;
+}
+
+.src,
+.links .src {
+  white-space: normal !important;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-gutter: 18px;
+    --gutter: 18px;
+    --radius: 14px;
+  }
+
+  .nav-in,
+  nav .wrap {
+    min-height: 60px;
+    height: auto !important;
+    gap: 8px !important;
+    padding-block: 8px !important;
+  }
+
+  .brand,
+  .navbrand {
+    display: none !important;
+  }
+
+  .nav-links,
+  .navlinks {
+    width: 100%;
+    margin-left: 0 !important;
+    padding-bottom: 2px;
+    justify-content: space-between;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .nav-links::-webkit-scrollbar,
+  .navlinks::-webkit-scrollbar {
+    display: block;
+    height: 2px;
+  }
+
+  nav a,
+  a.src,
+  a.tc,
+  a.t,
+  a.timecode,
+  a.btn,
+  button,
+  [role="button"],
+  .lbbtn,
+  #lb .close,
+  .lightbox .close,
+  [data-seek] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  nav a,
+  a.src,
+  a.tc,
+  a.t,
+  a.timecode,
+  a.btn,
+  button,
+  [role="button"],
+  .lbbtn,
+  #lb .close,
+  .lightbox .close,
+  a[data-seek],
+  button[data-seek],
+  span[data-seek] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-links a,
+  .navlinks a {
+    flex: 0 0 auto;
+    padding: 9px 8px !important;
+  }
+
+  section {
+    padding-block: 52px 36px !important;
+    scroll-margin-top: 56px !important;
+  }
+
+  header.hero,
+  .hero {
+    padding-block: 24px 24px !important;
+  }
+
+  .hero h1 {
+    font-size: clamp(30px, 8vw, 36px) !important;
+    line-height: 1.1;
+    margin-top: 18px;
+  }
+
+  .g2,
+  .g3,
+  .g4,
+  .grid:not(.g2):not(.g3):not(.g4),
+  .hero-grid,
+  .split,
+  .quotes,
+  .checks,
+  .facts,
+  .tools,
+  .debate,
+  [data-mobile-stack="grid"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [data-mobile-stack="flex"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .canvas:not([data-mobile-diagram="reflow"]),
+  figure:not([data-mobile-diagram="reflow"]):has(> svg[viewBox]) {
+    max-width: 100%;
+    overflow-x: auto !important;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .canvas:not([data-mobile-diagram="reflow"]) > svg[viewBox]:not([data-mobile-diagram="reflow"]),
+  figure:not([data-mobile-diagram="reflow"]) > svg[viewBox]:not([data-mobile-diagram="reflow"]) {
+    width: 640px !important;
+    min-width: 640px !important;
+    max-width: none !important;
+    height: auto;
+  }
+
+  .talk,
+  .trick,
+  .item,
+  .card,
+  .quote,
+  .fact,
+  .check:not(ul),
+  .check > li,
+  .deb,
+  .thesis,
+  .thesis-card,
+  blockquote,
+  .callout,
+  [data-mobile-card] {
+    padding: 20px 18px !important;
+  }
+
+  blockquote {
+    margin-inline: 0 !important;
+  }
+
+  .trick-head,
+  .item-head,
+  .shead,
+  .sec-head,
+  .code .bar,
+  .tl-head,
+  blockquote footer {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .shead,
+  .sec-head {
+    align-items: flex-start;
+    margin-bottom: 20px !important;
+  }
+
+  .shead h2,
+  .sec-head h2 {
+    font-size: 24px !important;
+  }
+
+  .shead .src,
+  .sec-head .src {
+    margin-left: 0 !important;
+  }
+
+  .trick-head .tnum,
+  .item-head .tnum {
+    min-width: 38px;
+    height: 38px;
+    font-size: 19px;
+  }
+
+  .trick-head h3,
+  .item-head h3 {
+    padding-top: 4px;
+    font-size: 20px;
+  }
+
+  .who {
+    padding-left: 0;
+  }
+
+  .about,
+  .key,
+  .try,
+  .risk {
+    padding: 15px 16px;
+  }
+
+  .hero .sub,
+  .hero .lede,
+  .hero .lead,
+  .lead,
+  .lede,
+  .sec-sub,
+  .talk p,
+  .trick p,
+  .trick li,
+  .item p,
+  .item li,
+  .card p,
+  .card li,
+  .quote .q,
+  .quote .ru,
+  blockquote .ru,
+  .tl-item p,
+  .timeline p,
+  .check .txt,
+  .check > li,
+  .deb li,
+  .callout,
+  .fact .d,
+  .tool .desc,
+  .watch-item p,
+  [data-mobile-copy],
+  [data-mobile-copy] p,
+  [data-mobile-copy] li,
+  [data-mobile-copy] dd {
+    font-size: 16px !important;
+  }
+
+  .fact {
+    align-items: flex-start;
+  }
+
+  .fact .v {
+    min-width: 0 !important;
+  }
+
+  .tl {
+    padding-left: 24px;
+  }
+
+  .tl-thumbs .shot {
+    width: 100% !important;
+  }
+
+  .links {
+    align-items: stretch;
+  }
+
+  .links .src {
+    min-height: 44px;
+    padding: 9px 11px;
+  }
+
+  .check:not(ul) {
+    flex-wrap: wrap;
+  }
+
+  .check .txt {
+    flex: 1 1 220px;
+  }
+
+  #lb,
+  .lightbox {
+    padding: 16px !important;
+  }
+
+  footer {
+    padding-block: 36px 60px !important;
+  }
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<nav>
+  <div class="nav-in">
+    <div class="brand"><span class="dot"></span>Мышление&nbsp;и&nbsp;агенты</div>
+    <div class="nav-links">
+      <a href="#spectrum">Спектр</a>
+      <a href="#questions">Вопросы</a>
+      <a href="#verify">Проверка</a>
+      <a href="#attention">Ревью</a>
+      <a href="#input">Вход</a>
+      <a href="#accountability">Ответственность</a>
+      <a href="#practice">Практики</a>
+      <a href="#apply">Как&nbsp;применить</a>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap hero">
+  <span class="eyebrow">● Статья · X · 3 ноября 2026</span>
+  <h1>Critical thinking when agents do the work</h1>
+  <p class="sub">Как не отдать агенту собственное понимание задачи, когда почти вся работа идёт через него, и где делегировать без оглядки.</p>
+  <div class="chips">
+    <span class="chip">✍️ <b>Addy Osmani</b></span>
+    <span class="chip">📅 3 ноября 2026</span>
+    <span class="chip">⏱ <b>~20 мин</b></span>
+    <span class="chip">🌐 x.com</span>
+  </div>
+  <div class="hero-grid">
+    <div class="thesis-card">
+      <div class="lab">Главный тезис</div>
+      <p>Чем лучше модели, тем реже их ответы требуют второго взгляда. Поэтому критическое мышление <span class="accent">приходится встраивать в рабочий день намеренно</span>: по умолчанию его уже ничто не запускает.</p>
+    </div>
+    <a class="cover" href="https://x.com/addyosmani/status/2117512471930167377" target="_blank" rel="noopener">
+      <img src="assets/img-00-spectrum.jpg" data-origin="article" alt="Обложка статьи: заголовок Critical thinking when agents do the work и кривая offloading → deferral → surrender">
+      <div class="ribbon">Читать оригинал на x.com ↗</div>
+    </a>
+  </div>
+</header>
+
+<section class="wrap" style="padding-top:30px">
+  <div class="shead rv"><span class="num">TL;DR</span><h2>Суть за минуту</h2></div>
+  <div class="grid g3">
+    <div class="card rv"><h3><span class="ic">📉</span>Сползание незаметно</h3><p>Сначала вы читаете ответ агента внимательно, потом пробегаете, потом смотрите только структуру. Каждый шаг кажется разумным, а в конце вы не можете объяснить строку собственного кода.</p></div>
+    <div class="card rv"><h3><span class="ic">⚖️</span>Делегируйте по цене ошибки</h3><p>Выбор отеля можно отдать модели целиком. Решения о деньгах, детях, продукте и релизе оставляйте себе: последствия достанутся другим людям.</p></div>
+    <div class="card rv"><h3><span class="ic">🧪</span>Гипотеза до вопроса</h3><p>Запишите ожидаемый ответ до запуска агента. После хорошо написанного ответа другой вариант уже трудно представить.</p></div>
+    <div class="card rv"><h3><span class="ic">✅</span>Зелёная галочка доказывает одно</h3><p>Агенты пишут тесты почти даром. Тест с той же ошибкой, что и фича, пройдёт. Спрашивайте, что проверка доказала и чего не доказала.</p></div>
+    <div class="card rv"><h3><span class="ic">✍️</span>Промпт показывает понимание</h3><p>Агент не остановит вас на размытой постановке: он сам заполнит пробелы и вернёт работу, похожую на готовую. Намерение должно прийти от вас.</p></div>
+    <div class="card rv"><h3><span class="ic">🧭</span>Ответственность остаётся у вас</h3><p>Работу и большую часть аудита можно отдать агенту. Ответственность за то, что уходит в продакшен, отдать нельзя.</p></div>
+  </div>
+</section>
+
+<section id="spectrum" class="wrap">
+  <div class="shead rv">
+    <span class="num">01</span><h2>Делегирование, перекладывание, капитуляция</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Offloading%2C%20deferral%20and%20surrender" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Osmani описывает работу с&nbsp;ИИ как спектр из трёх уровней. Различаются они одним: остаётся ли результат вашим.</p>
+
+  <div class="grid g3">
+    <div class="card lvl l1 rv"><span class="tag">вверху</span><h3>Cognitive offloading</h3><p>Вы отдаёте задачу ИИ, но результат остаётся вашим. Автор так работает весь день и советует так же.</p></div>
+    <div class="card lvl l2 rv"><span class="tag">посередине</span><h3>Deferral</h3><p>Вывод инструмента становится вашим входом. Результат перестаёт быть гипотезой, которую нужно проверить.</p></div>
+    <div class="card lvl l3 rv"><span class="tag">внизу</span><h3>Cognitive surrender</h3><p>Ответ ИИ незаметно становится вашим собственным мнением, и проверять его уже не хочется. Термин ввели Steven Shaw и Gideon Nave из&nbsp;Wharton.</p></div>
+  </div>
+
+  <div class="split mt">
+    <figure class="rv">
+      <div class="shot light" data-full="assets/img-00-spectrum.jpg" data-href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Offloading%2C%20deferral%20and%20surrender" data-cap="Обложка статьи: сплошная линия от offloading к deferral, затем пунктир вниз к surrender.">
+        <img src="assets/img-00-spectrum.jpg" data-origin="article" alt="Кривая: offloading, deferral и surrender, последний отрезок пунктирный и выделен оранжевым">
+        <span class="badge">рис. из статьи</span>
+        <span class="zoom"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></span>
+      </div>
+      <figcaption><b>Что показано:</b> спектр с обложки. Путь до deferral нарисован сплошной линией, спуск к surrender — пунктиром, и его легко не заметить.</figcaption>
+    </figure>
+    <div class="card rv">
+      <h3><span class="ic">🪜</span>Как люди сползают вниз</h3>
+      <div class="tl" style="margin-top:12px">
+        <div class="tl-item"><p>Последний ответ вы прочитали <b>внимательно</b>.</p></div>
+        <div class="tl-item"><p>Поэтому следующий только <b>пробегаете</b>.</p></div>
+        <div class="tl-item"><p>У третьего смотрите лишь <b>скелет</b>.</p></div>
+        <div class="tl-item end"><p>Вас спрашивают про строку, и вы <b>не можете её объяснить</b> даже с помощью агента.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2 mt">
+    <div class="card rv"><h3><span class="ic">🕳️</span>Долг понимания невидим</h3><p>Так копится cognitive debt. Margaret-Anne Storey пишет, как в командах размывается общая теория системы. Osmani называет кодовый вариант comprehension debt (термин Jeremy Twei): код выглядит чисто, тесты проходят, а проблема всплывает при первом изменении, когда систему уже никто не понимает. То же бывает с&nbsp;документом, у&nbsp;которого вы одобрили только оглавление.</p></div>
+    <div class="card rv"><h3><span class="ic">🔁</span>Полная модель не нужна</h3><p>Держать в голове целиком большую современную кодовую базу невозможно. Команда Claude Code восстанавливает понимание по запросу: просит Claude объяснить нужный кусок. По опыту автора, такой долг возвращается легче, чем ожидают инженеры. Важно знать, чего именно вы не понимаете.</p></div>
+  </div>
+
+  <table class="tbl rv mt">
+    <tr><th>Когда</th><th>Что делать</th><th>Пример из статьи</th></tr>
+    <tr><td>Ошибка обходится дёшево</td><td class="ok">Делегировать целиком</td><td>Выбор одного из трёх отелей с похожим рейтингом для записи курса</td></tr>
+    <tr><td>Последствия достанутся другим</td><td class="no">Оставить рассуждение себе</td><td>Куда вложить деньги, что посоветовать детям о карьере, что строить, кого затронет изменение, безопасно ли релизить</td></tr>
+  </table>
+  <p class="note rv"><b>Граница владения:</b> если вы не можете объяснить ответ даже с помощью агента, вы его уже отдали.</p>
+</section>
+
+<section id="questions" class="wrap">
+  <div class="shead rv">
+    <span class="num">02</span><h2>Шесть вопросов к себе</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=The%20questions%20I%20ask%20myself" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Раньше автор возвращался к базовому списку: та ли это задача, правильно ли я её решаю, есть ли доказательства, как понять, что работа закончена. Сейчас эти вопросы легко пропустить и сразу спросить агента, поэтому Osmani переформулировал их.</p>
+  <div class="grid g3">
+    <div class="card rv"><span class="en">Did I formulate a hypothesis before asking?</span><h3>Есть ли у меня гипотеза?</h3><p>Перед нетривиальной задачей запишите, хотя бы мысленно, ожидаемый ответ. Если идей нет совсем, попросите <strong>blind spot pass</strong> (приём Thariq Shihipar): дайте модели то, что знаете, и пусть она найдёт ваши неизвестные неизвестные.</p></div>
+    <div class="card rv"><span class="en">Help me think or offload thinking?</span><h3>Помогает думать или думает вместо меня?</h3><p>Оба режима допустимы, если вы знаете, в каком из них работаете.</p></div>
+    <div class="card rv"><span class="en">What would have to be true for this to be wrong?</span><h3>Что должно быть верно, чтобы это оказалось ошибкой?</h3><p>Найдите это. Самооценка уверенности у модели стоит меньше реального теста, так что дайте ей такой тест.</p></div>
+    <div class="card rv"><span class="en">Have I heard the counter argument?</span><h3>Слышал ли я контраргумент?</h3><p>Когда автор занимает жёсткую позицию по открытому вопросу, он просит несколько моделей доказать обратное и потом формирует своё мнение. Это дольше, но тему он в итоге знает лучше.</p></div>
+    <div class="card rv"><span class="en">Would I bet on this in front of the maintainer?</span><h3>Поставлю ли я на это перед тем, кто будет поддерживать?</h3><p>Касается кода и любого другого результата. Для автора это и есть планка ответственности.</p></div>
+    <div class="card rv"><span class="en">What am I no longer practicing?</span><h3>Что я перестал практиковать?</h3><p>Например, рутинную отладку. Отпустить часть навыков нормально, но решение должно быть осознанным.</p></div>
+  </div>
+</section>
+
+<section id="verify" class="wrap">
+  <div class="shead rv">
+    <span class="num">03</span><h2>Проверка как привычка</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Verification%20as%20a%20habit" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Узкое место сместилось с написания кода на уверенность в правильности результата. Если у агента есть способ проверить работу, он сам проходит цикл до того, как вы что-то увидите. Boris Cherny называет это «give Claude a way to verify its work».</p>
+
+  <div class="split">
+    <div class="rv"><div class="canvas" data-mobile-diagram="reflow">
+      <svg viewBox="0 0 360 400" font-family="Inter, sans-serif" role="img" aria-label="Цикл проверки агента и роль человека" data-mobile-diagram="reflow">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#a78bfa"/></marker>
+        <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#e07a5a"/></marker></defs>
+        <text x="180" y="22" text-anchor="middle" fill="#8a8aa2" font-size="12" font-family="JetBrains Mono">ЦИКЛ АГЕНТА</text>
+        <rect x="20" y="36" width="150" height="54" rx="10" fill="#171727" stroke="#7c5cff"/>
+        <text x="95" y="60" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">Вносит</text>
+        <text x="95" y="78" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">изменение</text>
+        <rect x="190" y="36" width="150" height="54" rx="10" fill="#171727" stroke="#7c5cff"/>
+        <text x="265" y="60" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">Запускает</text>
+        <text x="265" y="78" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">проверку</text>
+        <rect x="190" y="130" width="150" height="54" rx="10" fill="#171727" stroke="#7c5cff"/>
+        <text x="265" y="154" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">Читает</text>
+        <text x="265" y="172" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">вывод</text>
+        <rect x="20" y="130" width="150" height="54" rx="10" fill="#171727" stroke="#7c5cff"/>
+        <text x="95" y="154" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">Пробует</text>
+        <text x="95" y="172" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">снова</text>
+        <path d="M170 63H186" stroke="#a78bfa" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M265 90V126" stroke="#a78bfa" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M190 157H174" stroke="#a78bfa" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M95 130V94" stroke="#a78bfa" stroke-width="2" marker-end="url(#ar)"/>
+        <text x="180" y="218" text-anchor="middle" fill="#aeb4c8" font-size="12.5">e2e, property-тесты, действия в приложении</text>
+        <path d="M180 232V262" stroke="#e07a5a" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#ar2)"/>
+        <text x="180" y="290" text-anchor="middle" fill="#8a8aa2" font-size="12" font-family="JetBrains Mono">ВЫ</text>
+        <rect x="20" y="300" width="320" height="84" rx="12" fill="rgba(224,122,90,.10)" stroke="#e07a5a"/>
+        <text x="180" y="326" text-anchor="middle" fill="#f0f0f8" font-size="14" font-weight="600">Смотрите доказательства, а не summary:</text>
+        <text x="180" y="348" text-anchor="middle" fill="#f0f0f8" font-size="14">команду и её вывод, тест,</text>
+        <text x="180" y="368" text-anchor="middle" fill="#f0f0f8" font-size="14">скриншот, лог или trace</text>
+      </svg>
+      <div class="cap-hand">Схема конспекта: агент крутит цикл, вы проверяете доказательства</div>
+    </div></div>
+    <div class="grid">
+      <div class="card rv"><h3><span class="ic">🟢</span>Проверку тоже можно сдать</h3><p>Вопрос «есть ли доказательства?» превращается в «стала ли галочка зелёной?». Тест, написанный с той же ошибкой, что и фича, пройдёт. Зелёная проверка подтверждает одно свойство, а кажется, что покрывает всё.</p></div>
+      <div class="card rv"><h3><span class="ic">🏁</span>Финиш определяется заранее</h3><p>Задним числом вы оправдаете любой исход. Поэтому финиш задаётся осязаемым артефактом: прошедший тест, скриншот, лог или trace (запись шагов агента). Получив уведомление о готовности, сначала посмотрите выполненную команду и её вывод, потом summary.</p></div>
+      <div class="card rv"><h3><span class="ic">🔍</span>«Я ничего не упустил?»</h3><p>Claude Code может критиковать свою работу через subagent в свежем контексте. Автор встраивает это в цикл, чтобы шаг выполнялся всегда. В конце он спрашивает «Did I miss anything?», и frontier-модель обычно находит ещё два-три пункта.</p></div>
+    </div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card rv"><h3><span class="ic">📏</span>Когда нужен настоящий review</h3><p>Любимое правило автора из разбора code review в команде Claude Code: если вы не можете сказать, что пропустят проверки, просите полноценный review, а не быстрый approve.</p></div>
+    <div class="card rv"><h3><span class="ic">📞</span>Не только код</h3><p>Агент свёл пятьдесят звонков с клиентами или сделал конкурентный анализ? Откройте пару исходных документов. Пересчитайте число, на котором держится ваша рекомендация.</p></div>
+  </div>
+</section>
+
+<section id="attention" class="wrap">
+  <div class="shead rv">
+    <span class="num">04</span><h2>Читать то, что сгенерировано</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Actually%20paying%20attention%20to%20what%27s%20generated" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Агент присылает PR на 600 строк. Вы смотрите структуру, имена переменных выглядят разумно, тесты проходят, и вы одобряете. Где-то в середине поменялся порядок операций на границе транзакции или перевернулось значение по умолчанию в крайнем случае. Ревью было, но нашло только то, что вы заранее ожидали найти.</p>
+  <div class="grid g2">
+    <div class="card rv"><h3><span class="ic">🧩</span>Смотрите на решения агента</h3><p>Писать код и ревьюить его — разные навыки, и ревью легко превращается в штамп. Читайте diff так, будто его писал не ИИ. За длинную сессию агент принимает за вас много мелких решений: значения по умолчанию, что выходит за рамки задачи, какое требование переосмыслить при конфликте двух. Попросите его перечислить решения и допущения.</p></div>
+    <div class="card rv"><h3><span class="ic">📝</span>Устройте себе экзамен</h3><p>Выберите несколько случайных строк и спросите себя, что делает каждая. Документ закройте и перескажите главный аргумент по памяти. Для длинных сессий есть приём: Claude пишет отчёт об изменении с квизом в конце, и правило звучит как «I only merge after I pass the quiz perfectly».</p></div>
+    <div class="card rv"><h3><span class="ic">🛡️</span>Агент охраняет внимание</h3><p>В open source-проект автора приходит много pull request. Агенты помогают понять, что пришло, что противоречит правилам проекта и где нужен человек. Решение остаётся за автором, а внимание уходит на вопрос, правильную ли задачу решает изменение.</p></div>
+    <div class="card rv"><h3><span class="ic">🧾</span>Orchestration tax</h3><p>Так автор называет разрыв между объёмом, который генерируют агенты, и объёмом, под которым вы готовы поставить имя. Если готовая работа копится быстрее, чем вы её разбираете, новая сессия не поможет. Ужесточите проверки, чтобы меньше работы требовало вас, или замедлитесь.</p></div>
+  </div>
+  <p class="note rv"><b>Сигнал перегрузки:</b> если вы производите больше, чем можете отстоять, вы уже не ревьюите, а надеетесь.</p>
+</section>
+
+<section id="input" class="wrap">
+  <div class="shead rv">
+    <span class="num">05</span><h2>Качество на входе, качество на выходе</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Quality%20in%2C%20quality%20out" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Человеческая ментальная модель по-прежнему участвует в работе, но переехала из середины в начало и конец задачи.</p>
+  <div class="flow rv" data-mobile-stack="grid">
+    <div class="step you"><div class="who">вы · начало</div><h3>Постановка и контекст</h3><p>Свой бриф своими словами: аудитория, что вне рамок, критерий готовности.</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="who">агент · середина</div><h3>Работа</h3><p>Заполняет всё, что вы не сказали, и возвращает результат, похожий на готовый.</p></div>
+    <div class="arrow">→</div>
+    <div class="step you"><div class="who">вы · конец</div><h3>Ревью результата</h3><p>Свой стандарт качества: аккуратное оформление больше ничего не говорит о качестве.</p></div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card rv"><h3><span class="ic">🌫️</span>Intent debt</h3><p>Раньше на расплывчатую просьбу кто-нибудь возражал, и вы понимали, что ещё не продумали задачу. Агент обычно не возражает. Intent debt — неявные цели, ограничения и обоснования, которых нет в артефактах. Этот долг, в отличие от других, никто не закроет за вас.</p></div>
+    <div class="card rv"><h3><span class="ic">✏️</span>Переписать, а не подкручивать</h3><p>Если две итерации правок не привели к цели, перестаньте подправлять результат и перепишите промпт. По мысли автора, неясный промпт означает, что задача не ясна и вам самим.</p></div>
+    <div class="card rv"><h3><span class="ic">🤝</span>Сотрудничать, а не делегировать</h3><p>Andy Clark различает делегирование задачи ИИ и сотрудничество с ним. При сотрудничестве промпты уточняют результат, результат уточняет следующий промпт и вашу модель задачи. Если неясно, попросите агента взять у вас интервью о том, чего он не понимает. Удачная сессия заканчивается более чёткой моделью в вашей голове.</p></div>
+    <div class="card rv"><h3><span class="ic">🔗</span>Следите за входом цепочки</h3><p>Агенты легко передают друг другу summary предыдущего, и уже третий агент не видел исходного документа. Когда результат не дотягивает до вашей планки, запишите причину в общий конфиг, hook или тест. Так, по словам автора, накапливается вкус.</p></div>
+  </div>
+</section>
+
+<section id="accountability" class="wrap">
+  <div class="shead rv">
+    <span class="num">06</span><h2>«Модели всё равно станут лучше меня»</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=%22But%20the%20models%20will%20be%20better%20at%20this%20than%20me%22" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Возражение звучит так: через год-два модель найдёт всё, что нашёл бы я, зачем поддерживать навык? Osmani соглашается, что поиск ошибок всё больше уходит агентам, и сам за это выступает. Но кто-то отвечает за то, что уходит в продакшен.</p>
+  <div class="grid g3">
+    <div class="card rv"><h3><span class="ic">🎚️</span>Калибровка доверия</h3><p>Сколько доверять агенту в конкретной задаче — тоже решение человека. Ошибки моделей меняются от версии к версии, и откалиброваться можно только просматривая их работу.</p></div>
+    <div class="card rv"><h3><span class="ic">🔄</span>Парадокс надзора</h3><p>Исследование Anthropic о её инженерах формулирует ловушку: чтобы контролировать Claude, нужны те самые навыки программирования, которые атрофируются от избыточного использования ИИ.</p></div>
+    <div class="card rv"><h3><span class="ic">🧭</span>Вопросы, которые остаются вашими</h3><p>Что вы строите, зачем, кого это затронет и чем вы готовы пожертвовать. Агент поможет их продумать, но ответы за вами.</p></div>
+  </div>
+</section>
+
+<section id="practice" class="wrap">
+  <div class="shead rv">
+    <span class="num">07</span><h2>Повседневные практики</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Practices%20for%20the%20everyday" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>в статье</a>
+  </div>
+  <p class="lead rv">Автор не предлагает делать всё строго. Достаточно взять то, что ложится в ваш процесс.</p>
+  <table class="tbl rv">
+    <tr><th>Как часто</th><th>Практика</th></tr>
+    <tr><td>Раз в неделю</td><td>Напишите немного кода без агента или сделайте одно дело, которое было бы обидно разучиться делать. Автор называет это calibration exercise и подчёркивает, что смысл не моральный.</td></tr>
+    <tr><td>Раз в месяц</td><td>Запишите, что вы перестали делать, и решите, с чем из этого вы согласны расстаться.</td></tr>
+    <tr><td>Когда встречаете непонятное</td><td>Разберитесь в теме, а не вставляйте однострочное объяснение из поиска, чтобы увидеть, где это понятие на своём месте.</td></tr>
+    <tr><td>В планировании</td><td>Внесите проверку работы агентов отдельной строкой. Она требует времени, и команды, которые делают вид, что это бесплатно, перестают её делать.</td></tr>
+  </table>
+  <p class="note rv"><b>Вопрос из старого поста автора:</b> насколько вы будете потеряны, если ИИ исчезнет? Навыки без практики уходят быстрее, чем кажется.</p>
+</section>
+
+<section id="quotes" class="wrap">
+  <div class="shead rv"><span class="num">❝</span><h2>Цитаты</h2></div>
+  <div class="quotes">
+    <div class="quote rv"><div class="q">“Even if you are running many agents at a time, you still only have one pair of eyes on the outputs.”</div><div class="tr">Сколько бы агентов ни работало параллельно, проверяют их одни и те же глаза.</div>
+      <div class="m">вступление <a class="src" href="https://x.com/addyosmani/status/2117512471930167377" target="_blank" rel="noopener">в статье ↗</a></div></div>
+    <div class="quote rv"><div class="q">“When a check goes green, ask what it proved. Then ask what it didn't.”</div><div class="tr">Когда проверка позеленела, спросите, что она доказала. Потом — чего не доказала.</div>
+      <div class="m">проверка <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Verification%20as%20a%20habit" target="_blank" rel="noopener">в статье ↗</a></div></div>
+    <div class="quote rv"><div class="q">“Your prompt is a reflection of your understanding of the problem, and if you can't express it clearly, it may not be clear in your own mind.”</div><div class="tr">Промпт отражает ваше понимание задачи. Если не получается выразить её ясно, возможно, она не ясна и вам.</div>
+      <div class="m">вход <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=Quality%20in%2C%20quality%20out" target="_blank" rel="noopener">в статье ↗</a></div></div>
+    <div class="quote rv"><div class="q">“You may offload the work and much of the auditing, but not the accountability.”</div><div class="tr">Работу и большую часть аудита можно отдать. Ответственность — нет.</div>
+      <div class="m">ответственность <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=%22But%20the%20models%20will%20be%20better%20at%20this%20than%20me%22" target="_blank" rel="noopener">в статье ↗</a></div></div>
+  </div>
+</section>
+
+<section id="apply" class="wrap">
+  <div class="shead rv">
+    <span class="num">✅</span><h2>Как применить</h2>
+    <a class="src" href="https://x.com/addyosmani/status/2117512471930167377#:~:text=What%20to%20bring%20with%20you" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>итоги автора</a>
+  </div>
+  <p class="lead rv">Шаги собраны из финального списка автора «What to bring with you» и его практик. Отмечайте выполненное кликом.</p>
+  <div class="checks">
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Перед запуском агента</b> запишите ожидаемый ответ, даже если он плохой. После работы запишите одну вещь, которую агент не проверил. Автор предлагает посмотреть, изменит ли это то, как вы читаете вывод.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Разметьте задачи по цене ошибки.</b> Дешёвые ошибки делегируйте целиком. Где последствия лягут на других, рассуждение оставьте себе.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Задайте критерий «проверено» до старта:</b> конкретный тест, скриншот, лог или trace, а не «похоже, готово».</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Читайте доказательства раньше summary:</b> сначала выполненную команду и её вывод, потом отчёт агента.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Добавьте в цикл самокритику:</b> subagent со свежим контекстом проверяет работу каждый раз, а в конце вы спрашиваете «Did I miss anything?».</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Просите список решений и допущений</b> после длинной сессии. Проверьте себя по нескольким случайным строкам или квизу перед merge.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Пишите бриф своими словами:</b> аудитория, что вне рамок, критерий готовности. После второй неудачной итерации перепишите промпт.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Фиксируйте отказы:</b> почему результат не прошёл вашу планку, запишите в общий конфиг, hook или тест.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Следите за очередью готовой работы.</b> Если она растёт быстрее, чем вы её разбираете, ужесточите проверки или замедлитесь, а не открывайте ещё одну сессию.</div></div>
+    <div class="check rv"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div>
+      <div class="txt"><b>Раз в неделю</b> сделайте что-то важное без агента. <b>Раз в месяц</b> пересмотрите, какие навыки вы перестали практиковать.</div></div>
+  </div>
+
+  <figure class="rv mt" style="max-width:460px">
+    <div class="shot light" data-full="assets/img-01-pangram.png" data-href="https://x.com/addyosmani/status/2117512471930167377#:~:text=What%20to%20bring%20with%20you" data-cap="Оценка Pangram в конце статьи: Human-Written, AI 10%, AI-assisted 0%, Human 90%.">
+      <img src="assets/img-01-pangram.png" data-origin="article" alt="Pangram: Human-Written, AI 10%, AI-assisted 0%, Human 90%">
+      <span class="badge">рис. из статьи</span>
+    </div>
+    <figcaption><b>В конце статьи</b> автор приложил оценку Pangram: 90% текста определено как написанное человеком, 10% — как ИИ.</figcaption>
+  </figure>
+</section>
+
+<section class="wrap">
+  <div class="shead rv"><span class="num">🧰</span><h2>Ссылки и понятия</h2></div>
+  <div class="tools">
+    <div class="tool-col rv"><h3>// упомянуто в статье</h3>
+      <div class="tool"><a class="name" href="https://addyosmani.com/blog/cognitive-surrender/" target="_blank" rel="noopener">Cognitive surrender</a><span class="desc">пост автора о нижней точке спектра и calibration exercise</span></div>
+      <div class="tool"><a class="name" href="https://ssrn.com/abstract_id=6097646" target="_blank" rel="noopener">Shaw &amp; Nave, SSRN</a><span class="desc">работа из Wharton, где введён термин cognitive surrender</span></div>
+      <div class="tool"><a class="name" href="https://margaretstorey.com/blog/2026/02/09/cognitive-debt/" target="_blank" rel="noopener">Margaret-Anne Storey</a><span class="desc">cognitive debt в командах</span></div>
+      <div class="tool"><a class="name" href="https://addyosmani.com/blog/comprehension-debt/" target="_blank" rel="noopener">Comprehension debt</a><span class="desc">долг понимания кода</span></div>
+      <div class="tool"><a class="name" href="https://claude.dev/blog/solving-code-review-at-anthropic/" target="_blank" rel="noopener">Code review в Anthropic</a><span class="desc">как команда Claude Code восстанавливает понимание и ревьюит</span></div>
+      <div class="tool"><a class="name" href="https://claude.com/blog/a-field-guide-to-claude-fable-finding-your-unknowns" target="_blank" rel="noopener">Blind spot pass и квиз</a><span class="desc">поиск неизвестных неизвестных, «merge после квиза»</span></div>
+      <div class="tool"><a class="name" href="https://addyo.substack.com/p/agentic-verification" target="_blank" rel="noopener">Agentic verification</a><span class="desc">узкое место сместилось к проверке; накопление вкуса</span></div>
+      <div class="tool"><a class="name" href="https://x.com/bcherny/status/2007179861115511237" target="_blank" rel="noopener">Boris Cherny</a><span class="desc">«give Claude a way to verify its work»</span></div>
+      <div class="tool"><a class="name" href="https://addyo.substack.com/p/the-80-problem-in-agentic-coding" target="_blank" rel="noopener">The 80% problem</a><span class="desc">когда ревью превращается в штамп</span></div>
+      <div class="tool"><a class="name" href="https://addyosmani.com/blog/orchestration-tax/" target="_blank" rel="noopener">Orchestration tax</a><span class="desc">разрыв между генерацией и тем, что вы готовы подписать</span></div>
+      <div class="tool"><a class="name" href="https://oreillyradar.substack.com/p/the-intent-debt" target="_blank" rel="noopener">Intent debt</a><span class="desc">неявные цели и ограничения, которых нет в артефактах</span></div>
+      <div class="tool"><a class="name" href="https://pubmed.ncbi.nlm.nih.gov/40389440/" target="_blank" rel="noopener">Andy Clark</a><span class="desc">сотрудничество с ИИ вместо делегирования</span></div>
+      <div class="tool"><a class="name" href="https://www.anthropic.com/research/how-ai-is-transforming-work-at-anthropic" target="_blank" rel="noopener">Исследование Anthropic</a><span class="desc">парадокс надзора</span></div>
+      <div class="tool"><a class="name" href="https://addyo.substack.com/p/avoiding-skill-atrophy-in-the-age" target="_blank" rel="noopener">Avoiding skill atrophy</a><span class="desc">«насколько вы будете потеряны без ИИ?»</span></div>
+    </div>
+    <div class="tool-col rv"><h3>// ключевые понятия</h3>
+      <div class="tool"><span class="name">Cognitive offloading</span><span class="desc">задача у ИИ, результат остаётся вашим</span></div>
+      <div class="tool"><span class="name">Deferral</span><span class="desc">вывод инструмента становится вашим входом без проверки</span></div>
+      <div class="tool"><span class="name">Cognitive surrender</span><span class="desc">ответ ИИ незаметно становится вашим мнением</span></div>
+      <div class="tool"><span class="name">Comprehension debt</span><span class="desc">код работает, но его никто не понимает</span></div>
+      <div class="tool"><span class="name">Intent debt</span><span class="desc">цели и ограничения, которые не записаны и не переданы агенту</span></div>
+      <div class="tool"><span class="name">Orchestration tax</span><span class="desc">стоимость разбора всего, что сгенерировали агенты</span></div>
+      <div class="tool"><span class="name">Paradox of supervision</span><span class="desc">для надзора нужны навыки, которые атрофируются от ИИ</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Визуальный конспект статьи <b>«Critical thinking when agents do the work»</b> · Addy Osmani · x.com.<br>
+  Текст и рисунки взяты из статьи; схема цикла проверки нарисована для конспекта. <a href="https://x.com/addyosmani/status/2117512471930167377" target="_blank" rel="noopener">Открыть оригинал ↗</a>
+</footer>
+
+<div id="lb">
+  <span class="close">×</span>
+  <div class="lbcap" id="lbcap"></div>
+  <a class="lbbtn" id="lbbtn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-9 9"/></svg>Открыть в статье</a>
+</div>
+
+<script>
+(function(){
+  var prog=document.getElementById('progress');
+  function onScroll(){var h=document.documentElement;prog.style.width=((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';}
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
+
+  var navlinks=[].slice.call(document.querySelectorAll('.nav-links a'));
+  var secs=navlinks.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var spy=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var id='#'+e.target.id;navlinks.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')===id);});}});},{rootMargin:'-45% 0px -50% 0px'});
+  secs.forEach(function(s){if(s)spy.observe(s);});
+
+  var lb=document.getElementById('lb'),lbimg=document.createElement('img');lbimg.id='lbimg';lbimg.alt='';lb.insertBefore(lbimg,document.getElementById('lbcap'));var lbimg2=lbimg,lbcap=document.getElementById('lbcap'),lbbtn=document.getElementById('lbbtn');
+  document.querySelectorAll('.shot[data-full]').forEach(function(s){
+    s.addEventListener('click',function(){
+      lbimg.src=s.getAttribute('data-full');
+      lbcap.textContent=s.getAttribute('data-cap')||'';
+      var href=s.getAttribute('data-href');
+      if(href){lbbtn.href=href;lbbtn.style.display='inline-flex';}else{lbbtn.style.display='none';}
+      lb.classList.add('on');
+    });
+  });
+  function close(){lb.classList.remove('on');lbimg.src='';}
+  lb.addEventListener('click',function(e){if(e.target===lb||e.target.classList.contains('close'))close();});
+  lbbtn.addEventListener('click',function(e){e.stopPropagation();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+
+  document.querySelectorAll('.check').forEach(function(c){c.addEventListener('click',function(){c.classList.toggle('done');});});
+})();
+</script>
+</body>
+</html>
